@@ -84,10 +84,14 @@ class TankGame(ShowBase):
 
         self.scene.setTexture(envTexture)
 
-        commanderText = GameFunctionLibrary.displayScreenText(0.1, "Commander", 0.05)
-        gunnerText = GameFunctionLibrary.displayScreenText(0.2, "Gunner", 0.04)
-        loadertext = GameFunctionLibrary.displayScreenText(0.3, "Loader", 0.04)
-        driverText = GameFunctionLibrary.displayScreenText(0.4, "Driver", 0.04)
+        commanderText = {'textPos': 0.1, 'posString': "Commander"}
+        gunnerText = {'textPos': 0.15, 'posString': "Gunner"}
+        loaderText = {'textPos': 0.2, 'posString': "Loader"}
+        driverText = {'textPos': 0.25, 'posString': "Driver"}
+
+        positionUIElements = [commanderText, gunnerText, loaderText, driverText]
+
+        self.positionUIElementsActive = []
 
         lens = self.cam.node().getLens()
 
@@ -97,6 +101,10 @@ class TankGame(ShowBase):
         GameFunctionLibrary.configureCamera(lens, 105, 0.1, 3000)
 
         base.messenger.toggleVerbose()
+
+        self.keyMap = {"rotateCamera": 0}
+
+        self.occupiedPosition = {"occupiedPosition": 0}
 
 
 
@@ -172,16 +180,27 @@ class TankGame(ShowBase):
         loaderPosition = TankClass.crewPosition(2, turretInteriorSpace, -0.45, -0.3, 2.9)
         driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.9)
 
-        occupiedPosition = 1
+        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive)
 
-        occupiedPosition = GameFunctionLibrary.changePosition(commanderPosition.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ)
+        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive])
+        self.accept("1-up", self.changeOccupiedPosition, ["occupiedPosition", 0])
 
-        occupiedPosition = self.accept("1",GameFunctionLibrary.changePosition, [commanderPosition.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ])
-        occupiedPosition = self.accept("2",GameFunctionLibrary.changePosition, [gunnerPosition.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ])
-        occupiedPosition = self.accept("3",GameFunctionLibrary.changePosition, [loaderPosition.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ])
-        occupiedPosition = self.accept("4",GameFunctionLibrary.changePosition, [driverPosition.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ])
+        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ, positionUIElements, gunnerText, self.positionUIElementsActive])
+        self.accept("2-up", self.changeOccupiedPosition, ["occupiedPosition", 1])
 
-        self.keyMap = {"rotateCamera": 0}
+        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ, positionUIElements, loaderText, self.positionUIElementsActive])
+        self.accept("3-up", self.changeOccupiedPosition, ["occupiedPosition", 2])
+
+        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, positionUIElements, driverText, self.positionUIElementsActive])
+        self.accept("4-up", self.changeOccupiedPosition, ["occupiedPosition", 3])
+
+
+        def appendItemToList(item, list):
+            for i in list:
+                list.append(item)
+
+                return list
+
 
         self.accept("mouse3", self.setKey, ["rotateCamera", True])
         self.accept("mouse3-up", self.setKey, ["rotateCamera", False])
@@ -261,6 +280,9 @@ class TankGame(ShowBase):
     def setKey(self, key, value):
         self.keyMap[key] = value
 
+    def changeOccupiedPosition(self, key, value):
+        self.occupiedPosition[key] = value
+
     def rotateCamera(self, task):
         if self.keyMap["rotateCamera"]:
             props.setCursorHidden(True)
@@ -269,9 +291,9 @@ class TankGame(ShowBase):
             md = self.win.getPointer(0)
             x = md.getX()
             y = md.getY()
-            if self.win.movePointer(0, 100, 100):
-                self.heading = self.heading - (x - 100) * 0.2
-                self.pitch = self.pitch - (y - 100) * 0.2
+            if self.win.movePointer(0, 960, 540):
+                self.heading = self.heading - (x - 960) * 0.2
+                self.pitch = self.pitch - (y - 540) * 0.2
             if self.pitch < -90:
                 self.pitch = -90
             if self.pitch > 90:

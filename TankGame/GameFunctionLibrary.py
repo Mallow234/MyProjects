@@ -35,20 +35,24 @@ def displayScreenText(pos, msg, size):
                         pos=(0.08, -pos - 0.04), align=TextNode.ALeft)
 
 
-def changePosition(occupiedPosition, positionToMove, associatedSpace, cameraPosX, cameraPosY, cameraPosZ):
-	if positionToMove == occupiedPosition:
-		return occupiedPosition		
-
+def changePosition(occupiedPosition, positionToMove, associatedSpace, cameraPosX, cameraPosY, cameraPosZ, positionUIelements, positionUIToSwitch, textUIElementsList):
+	if occupiedPosition == positionToMove:
+		pass		
 	else:
 		camera.setPos(associatedSpace, cameraPosX, cameraPosY, cameraPosZ)
-		occupiedPosition = positionToMove
 
-		return occupiedPosition
+		for x in textUIElementsList:
+			del x
+
+		for i in positionUIelements:
+			if i != positionUIToSwitch:
+				i = displayScreenText(i['textPos'], i['posString'], 0.04)
 
 def lookThroughSight(sightObject, screenElement, associatedSpace, cameraPosX, cameraPosY, cameraPosZ, lens, fieldOfView):
 	if base.mouseWatcherNode.hasMouse():
 		mpos = base.mouseWatcherNode.getMouse()
 		pickerRay.setFromLens(base.camNode, mpos.getX(), mpos.getY())
+
 
 		
        
