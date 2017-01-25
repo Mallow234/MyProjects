@@ -35,10 +35,10 @@ def displayScreenText(pos, msg, size):
                         pos=(0.08, -pos - 0.04), align=TextNode.ALeft)
 
 
-def changePosition(occupiedPosition, positionToMove, associatedSpace, cameraPosX, cameraPosY, cameraPosZ, positionUIelements, positionUIToSwitch, textUIElementsList):
+def changePosition(occupiedPosition, positionToMove, associatedSpace, cameraPosX, cameraPosY, cameraPosZ, positionUIelements, positionUIToSwitch, textUIElementsList, isTurnedOut, keyIsTurnedOut):
 	if occupiedPosition == positionToMove:
 		pass		
-	else:
+	elif occupiedPosition != positionToMove and isTurnedOut[keyIsTurnedOut] == False:
 		camera.setPos(associatedSpace, cameraPosX, cameraPosY, cameraPosZ)
 
 		for x in textUIElementsList:
@@ -48,10 +48,28 @@ def changePosition(occupiedPosition, positionToMove, associatedSpace, cameraPosX
 			if i != positionUIToSwitch:
 				i = displayScreenText(i['textPos'], i['posString'], 0.04)
 
+	else:
+		pass
+
 def lookThroughSight(sightObject, screenElement, associatedSpace, cameraPosX, cameraPosY, cameraPosZ, lens, fieldOfView):
 	if base.mouseWatcherNode.hasMouse():
 		mpos = base.mouseWatcherNode.getMouse()
 		pickerRay.setFromLens(base.camNode, mpos.getX(), mpos.getY())
+
+def turnOut(occupiedPosition, associatedSpace, associatedSpaceCom, camPosX, camPosY, camPosZ, camPosXCom, camPosYCom, camPosZCom, outsideCamPosZ, outsideCamPosZCom, isTurnedOut, keyIsTurnedOut, keyOccupiedPosition):
+	if isTurnedOut[keyIsTurnedOut] == False and occupiedPosition[keyOccupiedPosition] == 0:
+		camera.setPos(associatedSpaceCom, camPosXCom, camPosYCom, outsideCamPosZCom)
+	elif isTurnedOut[keyIsTurnedOut] == False and occupiedPosition[keyOccupiedPosition] == 3:
+		camera.setPos(associatedSpace, camPosX, camPosY, outsideCamPosZ)
+	elif isTurnedOut[keyIsTurnedOut] == True and occupiedPosition[keyOccupiedPosition] == 0:
+		camera.setPos(associatedSpaceCom, camPosXCom, camPosYCom, camPosZCom)
+	elif isTurnedOut[keyIsTurnedOut] == True and occupiedPosition[keyOccupiedPosition] == 3:
+		camera.setPos(associatedSpace, camPosX, camPosY, camPosZ)
+	else:
+		pass
+
+
+
 
 
 		

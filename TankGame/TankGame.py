@@ -106,6 +106,8 @@ class TankGame(ShowBase):
 
         self.occupiedPosition = {"occupiedPosition": 0}
 
+        self.turnedOut = {"isTurnedOut": False}
+
 
 
         #load models and texture (FOR EXTERIOR)
@@ -178,32 +180,28 @@ class TankGame(ShowBase):
         commanderPosition = TankClass.crewPosition(0, turretInteriorSpace, 0.6, -0.5, 3.2)
         gunnerPosition = TankClass.crewPosition(1, turretInteriorSpace, 0.8, 0.4, 2.9)
         loaderPosition = TankClass.crewPosition(2, turretInteriorSpace, -0.45, -0.3, 2.9)
-        driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.9)
+        driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.86)
 
-        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive)
+        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
 
-        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive])
-        self.accept("1-up", self.changeOccupiedPosition, ["occupiedPosition", 0])
+        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("1-up", self.changeOccupiedPosition, ["occupiedPosition", 0, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ, positionUIElements, gunnerText, self.positionUIElementsActive])
-        self.accept("2-up", self.changeOccupiedPosition, ["occupiedPosition", 1])
+        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ, positionUIElements, gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("2-up", self.changeOccupiedPosition, ["occupiedPosition", 1, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ, positionUIElements, loaderText, self.positionUIElementsActive])
-        self.accept("3-up", self.changeOccupiedPosition, ["occupiedPosition", 2])
+        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ, positionUIElements, loaderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("3-up", self.changeOccupiedPosition, ["occupiedPosition", 2, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, positionUIElements, driverText, self.positionUIElementsActive])
-        self.accept("4-up", self.changeOccupiedPosition, ["occupiedPosition", 3])
-
-
-        def appendItemToList(item, list):
-            for i in list:
-                list.append(item)
-
-                return list
+        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, positionUIElements, driverText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("4-up", self.changeOccupiedPosition, ["occupiedPosition", 3, self.turnedOut, 'isTurnedOut'])
 
 
         self.accept("mouse3", self.setKey, ["rotateCamera", True])
         self.accept("mouse3-up", self.setKey, ["rotateCamera", False])
+
+        self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, driverPosition.associatedComponent, commanderPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, 2.5, 3.7, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
+        self.accept("t-up", self.setTurnedOut, ["isTurnedOut"])
 
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
 
@@ -280,8 +278,18 @@ class TankGame(ShowBase):
     def setKey(self, key, value):
         self.keyMap[key] = value
 
-    def changeOccupiedPosition(self, key, value):
-        self.occupiedPosition[key] = value
+    def changeOccupiedPosition(self, key, value, isTurnedOut, keyIsTurnedOut):
+        if isTurnedOut[keyIsTurnedOut] == False:
+            self.occupiedPosition[key] = value
+        else:
+            pass
+
+    def setTurnedOut(self, key):
+        if self.turnedOut[key] == False:
+            self.turnedOut[key] = True
+        else:
+            self.turnedOut[key] = False
+
 
     def rotateCamera(self, task):
         if self.keyMap["rotateCamera"]:
