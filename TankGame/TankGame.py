@@ -259,8 +259,9 @@ class TankGame(ShowBase):
 
         DO.accept('ray1-into-gunnerPrimarySight', self.collideInObject)
         DO.accept('ray1-out-gunnerPrimarySight', self.collideOutObject)
+        DO.accept('ray_again_all', self.ObjectCollide)
 
-        DO.accept('mouse1', self.mouseClick, ['down'])
+        DO.accept('mouse1-up', self.mouseClick, ['down'])
         DO.accept('mouse1', self.mouseClick, ['up'])
 
         taskMgr.add(self.rayUpdate, "updatePicker")
@@ -291,13 +292,17 @@ class TankGame(ShowBase):
 
             self.pickingEnabledObject = np_into.getParent()
 
+
     def mouseClick(self, status):
-        if self.pickingEnabledObject:
+        if self.pickingEnabledObject != None:
             if status == 'down':
-                pickingEnabledObject.setScale(.9)
+                self.pickingEnabledObject.setScale(0.5)
 
             if status == 'up':
-                pickingEnabledObject.setScale(1.0)
+                self.pickingEnabledObject.setScale(2)
+
+        elif self.pickingEnabledObject == None:
+            GameFunctionLibrary.displayScreenText(0.8, "hi", 0.1)
 
     def rayUpdate(self, task):
         if base.mouseWatcherNode.hasMouse():

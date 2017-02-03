@@ -51,7 +51,7 @@ class visionBlock(object):
 		return visionBlockName
 
 	def displayMessage(self):
-		GameFunctionLibrary.displayScreenText(0.6, "HI", 1)
+		GameFunctionLibrary.displayScreenText(0.3, "HI", 0.04)
 
 
 
