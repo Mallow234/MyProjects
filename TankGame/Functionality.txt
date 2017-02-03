@@ -1,11 +1,11 @@
 1) Interior functionality
 - proper 90 degree FOV (done, but 85 degrees :^))
-- implementation of commander, gunner, loader and driver positions(50% done)
+- implementation of commander, gunner, loader and driver positions(60% done)
 - looking through vision blocks and gunsights(2% complete)
 - implemented driver's position(done)
-- ability to turn out of driver's position and commander's cupola
+- ability to turn out of driver's position and commander's cupola (100%)
 - more detailed interior (25% done)
-- textures
+- textures (25% done)
 - indicators showing turret traverse
 - ammunition shown
 - controls to traverse turret and gun
@@ -25,3 +25,16 @@
 4) Code optimisation
 - work out how to use list in function (done lol)
 - cleanup code (ongoing process)
+
+
+
+Today:
+- Make class for gunner sight (done)
+- Instantiation based for now
+- Include method to render object and look down sight
+- Link class to collision
+- Make looking down sight method work with collision detection
+- enter and exit sight with right mouse button
+
+STRETCH GOAL:
+- make tooltip show up when hovering over collision mesh

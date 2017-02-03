@@ -5,6 +5,7 @@ from direct.showbase.ShowBase import ShowBase
 from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import PandaNode, NodePath, Camera, TextNode
 from direct.interval.IntervalGlobal import *
+from direct.gui.OnscreenImage import OnscreenImage
 import TankClass
 
 def configureCamera(lens, fieldOfView, nearDistance, farDistance):
@@ -69,6 +70,27 @@ def turnOut(occupiedPosition, associatedSpace, associatedSpaceCom, camPosX, camP
 		pass
 
 
+def binoculars(inBinoculars, lens, regularFOV, binocularZoom, binocularOverlay):
+	if inBinoculars == False:
+		inBinoculars = True
+		lens.setFov(binocularZoom)
+		binocularOverlay = OnscreenImage(image = '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/binocular.png', pos = (0, 0, 0))
+		binocularOverlay.reparentTo(render2d)
+		binocularOverlay.setTransparency(1)
+		returnArray = [inBinoculars, binocularOverlay]
+
+		return returnArray
+
+	elif inBinoculars == True:
+		inBinoculars = False
+		lens.setFov(regularFOV)
+		binocularOverlay.destroy()
+		binocularOverlay = None
+		returnArray = [inBinoculars, binocularOverlay]
+
+		return returnArray
+	else:
+		pass
 
 
 

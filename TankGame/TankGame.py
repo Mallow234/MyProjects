@@ -12,6 +12,7 @@ from panda3d.core import LPoint3, LVector3, BitMask32
 from panda3d.core import WindowProperties
 from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
+from direct.gui.OnscreenImage import OnscreenImage
 import TankClass
 import GameFunctionLibrary
 
@@ -67,7 +68,7 @@ class TankGame(ShowBase):
         ShowBase.__init__(self)
 
         #loading basic scene
-        self.scene = self.loader.loadModel("/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/basicscene.egg")
+        self.scene = self.loader.loadModel("/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/scene.egg")
 
         self.scene.reparentTo(self.render)
 
@@ -80,7 +81,7 @@ class TankGame(ShowBase):
         base.disableMouse()
 
         #loading environment texture
-        envTexture = loader.loadTexture("/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/envskin.png")
+        envTexture = loader.loadTexture("/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/groundtexture.png")
 
         self.scene.setTexture(envTexture)
 
@@ -93,12 +94,12 @@ class TankGame(ShowBase):
 
         self.positionUIElementsActive = []
 
-        lens = self.cam.node().getLens()
+        self.lens = self.cam.node().getLens()
 
         global props
         props = WindowProperties()
 
-        GameFunctionLibrary.configureCamera(lens, 105, 0.1, 3000)
+        GameFunctionLibrary.configureCamera(self.lens, 105, 0.1, 3000)
 
         base.messenger.toggleVerbose()
 
@@ -107,6 +108,16 @@ class TankGame(ShowBase):
         self.occupiedPosition = {"occupiedPosition": 0}
 
         self.turnedOut = {"isTurnedOut": False}
+
+        self.isInViewport = {"isLookingOut": False}
+
+        self.inBinoculars = False
+
+        self.binocularOverlay = None
+
+        self.inViewport = False
+
+        self.viewportOverlay = None
 
 
 
@@ -131,8 +142,6 @@ class TankGame(ShowBase):
         breechBar2 = GameFunctionLibrary.loadVehicleComponent(breechBar2Data[0], breechBar2Data[1], breechBar2Loader, turretInteriorSpace, 0, 0, 0)
 
         breechMesh = GameFunctionLibrary.loadVehicleComponent(breechMeshData[0], breechMeshData[1], breechMeshLoader, turretInteriorSpace, 0, 0, 0)
-
-        gunnerPrimarySight = GameFunctionLibrary.loadVehicleComponent(gunnerPrimarySightData[0], gunnerPrimarySightData[1], gunnerPrimarySightLoader, turretInteriorSpace, 0, 0, 0)
 
         gunnerSecondarySight = GameFunctionLibrary.loadVehicleComponent(gunnerSecondarySightData[0], gunnerSecondarySightData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
 
@@ -166,6 +175,12 @@ class TankGame(ShowBase):
         ignitionSwitch = GameFunctionLibrary.loadVehicleComponent(driverIgnitionSwitchData[0], driverIgnitionSwitchData[1], driverRightBarLoader, hullInteriorSpace, 0, 0, 0)
 
         auxPowerSwitch = GameFunctionLibrary.loadVehicleComponent(driverAuxPowerSwitchData[0], driverAuxPowerSwitchData[1], driverRightBarLoader, hullInteriorSpace, 0, 0, 0)
+
+        gunnerPrimarySight = TankClass.visionBlock(turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], None, None, None, None, None, None, None, None, None)
+        gunnerPrimarySightModel = gunnerPrimarySight.initialiseVisionBlock()
+        gunnerPrimarySightModel.setName('gunnerPrimarySight')
+
+
 
 
         #setting position and scale of tank
@@ -201,7 +216,9 @@ class TankGame(ShowBase):
         self.accept("mouse3-up", self.setKey, ["rotateCamera", False])
 
         self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, driverPosition.associatedComponent, commanderPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, 2.5, 3.7, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
-        self.accept("t-up", self.setTurnedOut, ["isTurnedOut"])
+        self.accept("t-up", self.setTurnedOut, ["isTurnedOut", "occupiedPosition"])
+
+        self.accept("b", self.binoculars, ["isTurnedOut", "occupiedPosition"])
 
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
 
@@ -212,68 +229,82 @@ class TankGame(ShowBase):
         self.last = 0
         self.mousebtn = [0, 0, 0]
 
-        global pickingEnabled
-        pickingEnabled = False
-        global screenHint
-        screenHint = 0
-
-        def collideEventIn(entry):
-            global pickingEnabled
-
-            np_from=entry.getFromNodePath()
-            np_into=entry.getIntoNodePath()
-            np_into.getParent().setColor(.6, 0.5, 1.0, 1)
-            pickingEnabled=True
-
-        def collideEventOut(entry):
-            global pickingEnabled
-
-            pickingEnabled=False
-
-            np_into=entry.getIntoNodePath()
-            np_into.getParent().setColor(1.0, 1.0, 1.0, 1)
-
-
-        def rayupdate(task):
-            if base.mouseWatcherNode.hasMouse():
-                mpos=base.mouseWatcherNode.getMouse()
-                pickerRay.setFromLens(base.camNode, mpos.getX(),mpos.getY())
-            return task.cont
-
-        def mousePick(status):
-            if pickingEnabled:
-                if status == 'down':
-                    gunnerPrimarySight.setScale(.9)
-                
-                if status == 'up':
-                    gunnerPrimarySight.setScale(2)
+        #Turret interior collision system
+        self.pickingEnabledObject = None
 
         base.cTrav = CollisionTraverser()
         collisionHandler = CollisionHandlerEvent()
 
-        pickerNode=CollisionNode('mouseraycnode')
-        pickerNP=base.camera.attachNewNode(pickerNode)
-        pickerRay=CollisionRay()
-        pickerNode.addSolid(pickerRay)
+        pickerNode = CollisionNode('mouseraycnode')
+        pickerNP = base.camera.attachNewNode(pickerNode)
+        self.pickerRay = CollisionRay()
+        pickerNode.addSolid(self.pickerRay)
+
+        pickerNode.setTag('rays','ray1')
         base.cTrav.addCollider(pickerNP, collisionHandler)
 
-        gunnerPrimarySightCollider = gunnerPrimarySight.attachNewNode(CollisionNode('gunnerPrimarySightcnode'))
-        gunnerPrimarySightCollider.node().addSolid(CollisionSphere(-1.155, 0.9, 2.55, 0.1))
+        gunnerPrimarySightCollider = gunnerPrimarySightModel.attachNewNode(CollisionNode('gunnerPrimarySightCNode'))
+        gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.6, 0.8, 2.4, 0.2))
 
         gunnerPrimarySightCollider.show()
 
-        collisionHandler.addInPattern('%fn-into-%in')
-        collisionHandler.addOutPattern('%fn-out-%in')
+        gunnerPrimarySightCollider.setTag('viewport', 'gunnerPrimarySight')
 
-        DO=DirectObject()
+        collisionHandler.addInPattern("%(rays)ft-into-%(viewport)it")
+        collisionHandler.addOutPattern("%(rays)ft-out-%(viewport)it")
 
-        DO.accept('mouseraycnode-into-gunnerPrimarySightcnode', collideEventIn)
-        DO.accept('mouseraycnode-out-gunnerPrimarySightcnode', collideEventOut)
+        collisionHandler.addAgainPattern("ray_again_all%(""rays"")fh%(""viewport"")ih")       
 
-        DO.accept('mouse1', mousePick, ['down'])
-        DO.accept('mouse1-up', mousePick, ['up'])
+        DO = DirectObject()
 
-        taskMgr.add(rayupdate, "updatePicker")
+        DO.accept('ray1-into-gunnerPrimarySight', self.collideInObject)
+        DO.accept('ray1-out-gunnerPrimarySight', self.collideOutObject)
+
+        DO.accept('mouse1', self.mouseClick, ['down'])
+        DO.accept('mouse1', self.mouseClick, ['up'])
+
+        taskMgr.add(self.rayUpdate, "updatePicker")
+
+
+
+
+        AI_Tank_1 = TankClass.AI_Tank_Type37(self.scene, 40, -40, 0, 30, 1)
+        AI_Tank_1_Model = AI_Tank_1.spawnTank()
+
+        AI_Tank_2 = TankClass.AI_Tank_Type37(self.scene, -10, 50, 0, 170, 2)
+        AI_Tank_2_Model = AI_Tank_2.spawnTank()
+
+        AI_Tank_3 = TankClass.AI_Tank_Type37(self.scene, -30, 20, 0, 180, 3)
+        AI_Tank_3_Model = AI_Tank_3.spawnTank()
+
+    def collideInObject(self, entry):
+        np_into = entry.getIntoNodePath()
+
+    def collideOutObject(self, entry):
+        np_into = entry.getIntoNodePath()
+        self.pickingEnabledObject = None 
+
+    def ObjectCollide(self, entry):
+        if entry.getIntoNodePath().getParent() <> self.pickingEnabledObject:
+            np_from = entry.getFromNodePath()
+            np_into = entry.getIntoNodePath()
+
+            self.pickingEnabledObject = np_into.getParent()
+
+    def mouseClick(self, status):
+        if self.pickingEnabledObject:
+            if status == 'down':
+                pickingEnabledObject.setScale(.9)
+
+            if status == 'up':
+                pickingEnabledObject.setScale(1.0)
+
+    def rayUpdate(self, task):
+        if base.mouseWatcherNode.hasMouse():
+            mpos = base.mouseWatcherNode.getMouse()
+            self.pickerRay.setFromLens(base.camNode, mpos.getX(), mpos.getY())
+
+        return task.cont
 
     def setKey(self, key, value):
         self.keyMap[key] = value
@@ -284,12 +315,24 @@ class TankGame(ShowBase):
         else:
             pass
 
-    def setTurnedOut(self, key):
-        if self.turnedOut[key] == False:
+    def setTurnedOut(self, key, keyOccupiedPosition):
+        if self.turnedOut[key] == False and (self.occupiedPosition[keyOccupiedPosition] != 1 and self.occupiedPosition[keyOccupiedPosition] != 2):
             self.turnedOut[key] = True
         else:
             self.turnedOut[key] = False
 
+    def binoculars(self, key, keyOccupiedPosition):
+        if self.turnedOut[key] == True and self.occupiedPosition[keyOccupiedPosition] == 0 and self.inBinoculars == False:
+            binocularsOutput = GameFunctionLibrary.binoculars(self.inBinoculars, self.lens, 105, 15, self.binocularOverlay)
+            self.inBinoculars = binocularsOutput[0]
+            self.binocularOverlay = binocularsOutput[1]
+
+        elif self.turnedOut[key] == True and self.occupiedPosition[keyOccupiedPosition] == 0 and self.inBinoculars == True:
+            binocularsOutput = GameFunctionLibrary.binoculars(self.inBinoculars, self.lens, 105, 15, self.binocularOverlay)
+            self.inBinoculars = binocularsOutput[0]
+            self.binocularOverlay = binocularsOutput[1]
+        else:
+            pass
 
     def rotateCamera(self, task):
         if self.keyMap["rotateCamera"]:
