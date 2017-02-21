@@ -193,7 +193,7 @@ class TankGame(ShowBase):
         camera.setPos(turretInteriorSpace, 0, 0, 3)
         camera.setHpr(turretInteriorSpace, 0, 0, 0)
 
-        commanderPosition = TankClass.crewPosition(0, turretInteriorSpace, 0.6, -0.5, 3.2)
+        commanderPosition = TankClass.crewPosition(0, turretInteriorSpace, 0.6, -0.5, 3.16)
         gunnerPosition = TankClass.crewPosition(1, turretInteriorSpace, 0.8, 0.4, 2.9)
         loaderPosition = TankClass.crewPosition(2, turretInteriorSpace, -0.45, -0.3, 2.9)
         driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.86)
