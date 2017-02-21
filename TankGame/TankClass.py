@@ -7,6 +7,7 @@ from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import PandaNode, NodePath, Camera, TextNode
 from direct.interval.IntervalGlobal import *
 from direct.gui.OnscreenImage import OnscreenImage
+from panda3d.core import WindowProperties
 import GameFunctionLibrary
 
 class crewPosition(object):

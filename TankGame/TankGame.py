@@ -86,11 +86,11 @@ class TankGame(ShowBase):
         self.scene.setTexture(envTexture)
 
         commanderText = {'textPos': 0.1, 'posString': "Commander"}
-        gunnerText = {'textPos': 0.15, 'posString': "Gunner"}
+        self.gunnerText = {'textPos': 0.15, 'posString': "Gunner"}
         loaderText = {'textPos': 0.2, 'posString': "Loader"}
         driverText = {'textPos': 0.25, 'posString': "Driver"}
 
-        positionUIElements = [commanderText, gunnerText, loaderText, driverText]
+        self.positionUIElements = [commanderText, self.gunnerText, loaderText, driverText]
 
         self.positionUIElementsActive = []
 
@@ -134,31 +134,31 @@ class TankGame(ShowBase):
         tankGun = GameFunctionLibrary.loadVehicleComponent(gunData[0], gunData[1], tankGunLoader, tankTurret, 0, 0, 0)
 
         #load models and texture (FOR INTERIOR)
-        turretInteriorSpace = GameFunctionLibrary.loadVehicleComponent(turretInteriorData[0], turretInteriorData[1], interiorTurretLoader, tankTurret, 0, 0, 0)
+        self.turretInteriorSpace = GameFunctionLibrary.loadVehicleComponent(turretInteriorData[0], turretInteriorData[1], interiorTurretLoader, tankTurret, 0, 0, 0)
 
         hullInteriorSpace = GameFunctionLibrary.loadVehicleComponent(hullInteriorData[0], hullInteriorData[1], interiorHullLoader, tankHull, 0, 0, 0)
 
-        breech = GameFunctionLibrary.loadVehicleComponent(breechAssemblyData[0], breechAssemblyData[1], breechAssemblyLoader, turretInteriorSpace, 0, 0, 0)
+        breech = GameFunctionLibrary.loadVehicleComponent(breechAssemblyData[0], breechAssemblyData[1], breechAssemblyLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        breechBar1 = GameFunctionLibrary.loadVehicleComponent(breechBar1Data[0], breechBar1Data[1], breechBar1Loader, turretInteriorSpace, 0, 0, 0)
+        breechBar1 = GameFunctionLibrary.loadVehicleComponent(breechBar1Data[0], breechBar1Data[1], breechBar1Loader, self.turretInteriorSpace, 0, 0, 0)
 
-        breechBar2 = GameFunctionLibrary.loadVehicleComponent(breechBar2Data[0], breechBar2Data[1], breechBar2Loader, turretInteriorSpace, 0, 0, 0)
+        breechBar2 = GameFunctionLibrary.loadVehicleComponent(breechBar2Data[0], breechBar2Data[1], breechBar2Loader, self.turretInteriorSpace, 0, 0, 0)
 
-        breechMesh = GameFunctionLibrary.loadVehicleComponent(breechMeshData[0], breechMeshData[1], breechMeshLoader, turretInteriorSpace, 0, 0, 0)
+        breechMesh = GameFunctionLibrary.loadVehicleComponent(breechMeshData[0], breechMeshData[1], breechMeshLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        gunnerSecondarySight = GameFunctionLibrary.loadVehicleComponent(gunnerSecondarySightData[0], gunnerSecondarySightData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        gunnerSecondarySight = GameFunctionLibrary.loadVehicleComponent(gunnerSecondarySightData[0], gunnerSecondarySightData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        turretPowerTraverse = GameFunctionLibrary.loadVehicleComponent(turretPowerTraverseData[0], turretPowerTraverseData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        turretPowerTraverse = GameFunctionLibrary.loadVehicleComponent(turretPowerTraverseData[0], turretPowerTraverseData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        turretSeats = GameFunctionLibrary.loadVehicleComponent(turretSeatsData[0], turretSeatsData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        turretSeats = GameFunctionLibrary.loadVehicleComponent(turretSeatsData[0], turretSeatsData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        commanderVisionBlockFront = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockFrontData[0], commanderVisionBlockFrontData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        commanderVisionBlockFront = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockFrontData[0], commanderVisionBlockFrontData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        commanderVisionBlockLeft = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockLeftData[0], commanderVisionBlockLeftData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        commanderVisionBlockLeft = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockLeftData[0], commanderVisionBlockLeftData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        commanderVisionBlockRight = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockRightData[0], commanderVisionBlockRightData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        commanderVisionBlockRight = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockRightData[0], commanderVisionBlockRightData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
-        commanderVisionBlockRear = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockBackData[0], commanderVisionBlockBackData[1], gunnerSecondarySightLoader, turretInteriorSpace, 0, 0, 0)
+        commanderVisionBlockRear = GameFunctionLibrary.loadVehicleComponent(commanderVisionBlockBackData[0], commanderVisionBlockBackData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
 
         driverSeat = GameFunctionLibrary.loadVehicleComponent(driverSeatData[0], driverSeatData[1], driverSeatLoader, hullInteriorSpace, 0, 0, 0)
@@ -179,7 +179,7 @@ class TankGame(ShowBase):
 
         auxPowerSwitch = GameFunctionLibrary.loadVehicleComponent(driverAuxPowerSwitchData[0], driverAuxPowerSwitchData[1], driverRightBarLoader, hullInteriorSpace, 0, 0, 0)
 
-        self.gunnerPrimarySight = TankClass.visionBlock(turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], tankGun, 0.5, 1.6, 2.8, 0, 0, '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/primgunsight.png', 20, 105, self.lens)
+        self.gunnerPrimarySight = TankClass.visionBlock(self.turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], tankGun, 0.5, 1.6, 2.8, 0, 0, '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/primgunsight.png', 20, 105, self.lens)
         gunnerPrimarySightModel = self.gunnerPrimarySight.initialiseVisionBlock()
         gunnerPrimarySightModel.setName('gunnerPrimarySight')
 
@@ -187,31 +187,31 @@ class TankGame(ShowBase):
 
 
         #setting position and scale of tank
-        turretInteriorSpace.set_two_sided(True)
+        self.turretInteriorSpace.set_two_sided(True)
         hullInteriorSpace.set_two_sided(True)
         breechMesh.set_two_sided(True)
 
         #setting beginning camera position
-        camera.setPos(turretInteriorSpace, 0, 0, 3)
-        camera.setHpr(turretInteriorSpace, 0, 0, 0)
+        camera.setPos(self.turretInteriorSpace, 0, 0, 3)
+        camera.setHpr(self.turretInteriorSpace, 0, 0, 0)
 
-        commanderPosition = TankClass.crewPosition(0, turretInteriorSpace, 0.6, -0.5, 3.16)
-        gunnerPosition = TankClass.crewPosition(1, turretInteriorSpace, 0.8, 0.4, 2.9)
-        loaderPosition = TankClass.crewPosition(2, turretInteriorSpace, -0.45, -0.3, 2.9)
+        commanderPosition = TankClass.crewPosition(0, self.turretInteriorSpace, 0.6, -0.5, 3.16)
+        gunnerPosition = TankClass.crewPosition(1, self.turretInteriorSpace, 0.8, 0.4, 2.9)
+        loaderPosition = TankClass.crewPosition(2, self.turretInteriorSpace, -0.45, -0.3, 2.9)
         driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.86)
 
-        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
+        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
 
-        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("1-up", self.changeOccupiedPosition, ["occupiedPosition", 0, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ, positionUIElements, gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("2-up", self.changeOccupiedPosition, ["occupiedPosition", 1, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ, positionUIElements, loaderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ, self.positionUIElements, loaderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("3-up", self.changeOccupiedPosition, ["occupiedPosition", 2, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, positionUIElements, driverText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, self.positionUIElements, driverText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("4-up", self.changeOccupiedPosition, ["occupiedPosition", 3, self.turnedOut, 'isTurnedOut'])
 
 
@@ -223,7 +223,7 @@ class TankGame(ShowBase):
 
         self.accept("b", self.binoculars, ["isTurnedOut", "occupiedPosition"])
 
-        self.accept("escape", self.lookDownPrimarySight, [True])
+        self.accept("escape", self.lookDownPrimarySight, [True, "occupiedPosition"])
 
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
 
@@ -251,7 +251,7 @@ class TankGame(ShowBase):
         gunnerPrimarySightCollider = gunnerPrimarySightModel.attachNewNode(CollisionNode('gunnerPrimarySightCNode'))
         gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.575, 0.64, 2.64, 0.08))
 
-        gunnerPrimarySightCollider.show()
+        #gunnerPrimarySightCollider.show()
 
         gunnerPrimarySightCollider.setTag('viewport', 'gunnerPrimarySight')
         gunnerPrimarySightModel.setTag('viewport', 'gunnerPrimarySight')
@@ -301,7 +301,7 @@ class TankGame(ShowBase):
     def mouseClick(self, status):
         if self.pickingEnabledObject != None:
             if status == 'down' and self.pickingEnabledObject.hasTag('viewport'):
-                self.lookDownPrimarySight(False)
+                self.lookDownPrimarySight(False, "occupiedPosition")
             else:
                 pass
 
@@ -370,15 +370,18 @@ class TankGame(ShowBase):
 
         return task.cont
 
-    def lookDownPrimarySight(self, externalSightActivation):
-        if self.inViewport == False and externalSightActivation == False:
+    def lookDownPrimarySight(self, externalSightActivation, keyOccupiedPosition):
+        if self.inViewport == False and externalSightActivation == False and self.occupiedPosition[keyOccupiedPosition] == 1:
             self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
             self.inViewport = True
             self.lookingEnabled = False
+
         elif self.inViewport == True and externalSightActivation == True:
             self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
             self.inViewport = False
             self.lookingEnabled = True
+            GameFunctionLibrary.changePosition(self.occupiedPosition, 5, self.turretInteriorSpace, 0.8, 0.4, 2.9, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
+    
 
 
 
