@@ -56,17 +56,17 @@ class visionBlock(object):
 	def lookInVisionBlock(self, inViewport, visionBlockOverlay):
 		if inViewport == False:
 			camera.setPos(self.associatedCamComponent, self.camPosX, self.camPosY, self.camPosZ)
+			camera.setHpr(0, 0, 0)
 			visionBlockOverlay = OnscreenImage(self.visionBlockTexture, pos = (0, 0, 0))
 			visionBlockOverlay.setTransparency(1)
+			visionBlockOverlay.reparentTo(render2d)
 			self.lens.setFov(self.visionBlockFOV)
 			return visionBlockOverlay
 
 		elif inViewport == True:
 			visionBlockOverlay.destroy()
 			self.lens.setFov(self.regularFOV)
-
-		else:
-			pass
+			return visionBlockOverlay
 
 
 

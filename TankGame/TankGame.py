@@ -119,6 +119,8 @@ class TankGame(ShowBase):
 
         self.viewportOverlay = None
 
+        self.lookingEnabled = True
+
 
 
 
@@ -221,7 +223,7 @@ class TankGame(ShowBase):
 
         self.accept("b", self.binoculars, ["isTurnedOut", "occupiedPosition"])
 
-        self.accept("mouse3", self.lookDownPrimarySight, [False])
+        self.accept("escape", self.lookDownPrimarySight, [True])
 
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
 
@@ -342,13 +344,13 @@ class TankGame(ShowBase):
             pass
 
     def rotateCamera(self, task):
-        if self.keyMap["rotateCamera"]:
+        if self.keyMap["rotateCamera"] and self.lookingEnabled == True:
             props.setCursorHidden(True)
             base.win.requestProperties(props)
 
             md = self.win.getPointer(0)
             x = md.getX()
-            y = md.getY()23
+            y = md.getY()
             if self.win.movePointer(0, 960, 540):
                 self.heading = self.heading - (x - 960) * 0.2
                 self.pitch = self.pitch - (y - 540) * 0.2
@@ -361,23 +363,22 @@ class TankGame(ShowBase):
             if self.last == 0:
                 elapsed = 0
             self.last = task.time
-
+            
         if self.keyMap["rotateCamera"] == False:
             props.setCursorHidden(False)
             base.win.requestProperties(props)
 
         return task.cont
 
-    def lookDownPrimarySight(self, inSightActivation):
-        if self.inViewport == False and inSightActivation == False:
+    def lookDownPrimarySight(self, externalSightActivation):
+        if self.inViewport == False and externalSightActivation == False:
             self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
             self.inViewport = True
-        elif self.inViewport == True and inSightActivation == True:
+            self.lookingEnabled = False
+        elif self.inViewport == True and externalSightActivation == True:
             self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
             self.inViewport = False
-
-
-
+            self.lookingEnabled = True
 
 
 
