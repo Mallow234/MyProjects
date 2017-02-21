@@ -6,6 +6,7 @@ from direct.showbase.ShowBase import ShowBase
 from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import PandaNode, NodePath, Camera, TextNode
 from direct.interval.IntervalGlobal import *
+from direct.gui.OnscreenImage import OnscreenImage
 import GameFunctionLibrary
 
 class crewPosition(object):
@@ -17,7 +18,7 @@ class crewPosition(object):
 		self.camPosZ = camPosZ
 
 class visionBlock(object):
-	def __init__(self, associatedComponent, posX, posY, posZ, model, texture, associatedCamComponent, camPosX, camPosY, camPosZ, camHeading, camPitch, visionBlockTexture, visionBlockFOV, regularFOV):
+	def __init__(self, associatedComponent, posX, posY, posZ, model, texture, associatedCamComponent, camPosX, camPosY, camPosZ, camHeading, camPitch, visionBlockTexture, visionBlockFOV, regularFOV, lens):
 		self.associatedComponent = associatedComponent
 		self.posX = posX
 		self.posY = posY
@@ -37,6 +38,8 @@ class visionBlock(object):
 		self.visionBlockFOV = visionBlockFOV
 		self.regularFOV = regularFOV
 
+		self.lens = lens
+
 
 
 	def initialiseVisionBlock(self):
@@ -50,8 +53,22 @@ class visionBlock(object):
 
 		return visionBlockName
 
-	def displayMessage(self):
-		GameFunctionLibrary.displayScreenText(0.3, "HI", 0.04)
+	def lookInVisionBlock(self, inViewport, visionBlockOverlay):
+		if inViewport == False:
+			camera.setPos(self.associatedCamComponent, self.camPosX, self.camPosY, self.camPosZ)
+			visionBlockOverlay = OnscreenImage(self.visionBlockTexture, pos = (0, 0, 0))
+			visionBlockOverlay.setTransparency(1)
+			self.lens.setFov(self.visionBlockFOV)
+			return visionBlockOverlay
+
+		elif inViewport == True:
+			visionBlockOverlay.destroy()
+			self.lens.setFov(self.regularFOV)
+
+		else:
+			pass
+
+
 
 
 

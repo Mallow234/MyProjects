@@ -16,7 +16,7 @@
 - tracks and wheels spawned (not animated)
 - ability to "drive" vehicle (on rails)
 - proper skybox
-- better looking terrain, possibly tiling
+- better looking terrain, possibly tiling (30% done)
 
 3) Quality of life functionality
 - help bar

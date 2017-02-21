@@ -121,6 +121,7 @@ class TankGame(ShowBase):
 
 
 
+
         #load models and texture (FOR EXTERIOR)
         tankHull = GameFunctionLibrary.loadVehicleComponent(hullData[0] , hullData[1], tankHullLoader, None, 0, 0, 0)
 
@@ -176,8 +177,8 @@ class TankGame(ShowBase):
 
         auxPowerSwitch = GameFunctionLibrary.loadVehicleComponent(driverAuxPowerSwitchData[0], driverAuxPowerSwitchData[1], driverRightBarLoader, hullInteriorSpace, 0, 0, 0)
 
-        gunnerPrimarySight = TankClass.visionBlock(turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], None, None, None, None, None, None, None, None, None)
-        gunnerPrimarySightModel = gunnerPrimarySight.initialiseVisionBlock()
+        self.gunnerPrimarySight = TankClass.visionBlock(turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], tankGun, 0.5, 1.6, 2.8, 0, 0, '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/primgunsight.png', 20, 105, self.lens)
+        gunnerPrimarySightModel = self.gunnerPrimarySight.initialiseVisionBlock()
         gunnerPrimarySightModel.setName('gunnerPrimarySight')
 
 
@@ -220,6 +221,8 @@ class TankGame(ShowBase):
 
         self.accept("b", self.binoculars, ["isTurnedOut", "occupiedPosition"])
 
+        self.accept("mouse3", self.lookDownPrimarySight, [False])
+
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
 
         self.heading = 180
@@ -244,11 +247,12 @@ class TankGame(ShowBase):
         base.cTrav.addCollider(pickerNP, collisionHandler)
 
         gunnerPrimarySightCollider = gunnerPrimarySightModel.attachNewNode(CollisionNode('gunnerPrimarySightCNode'))
-        gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.6, 0.8, 2.4, 0.2))
+        gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.575, 0.64, 2.64, 0.08))
 
         gunnerPrimarySightCollider.show()
 
         gunnerPrimarySightCollider.setTag('viewport', 'gunnerPrimarySight')
+        gunnerPrimarySightModel.setTag('viewport', 'gunnerPrimarySight')
 
         collisionHandler.addInPattern("%(rays)ft-into-%(viewport)it")
         collisionHandler.addOutPattern("%(rays)ft-out-%(viewport)it")
@@ -261,8 +265,7 @@ class TankGame(ShowBase):
         DO.accept('ray1-out-gunnerPrimarySight', self.collideOutObject)
         DO.accept('ray_again_all', self.ObjectCollide)
 
-        DO.accept('mouse1-up', self.mouseClick, ['down'])
-        DO.accept('mouse1', self.mouseClick, ['up'])
+        DO.accept('mouse1', self.mouseClick, ['down'])
 
         taskMgr.add(self.rayUpdate, "updatePicker")
 
@@ -295,14 +298,13 @@ class TankGame(ShowBase):
 
     def mouseClick(self, status):
         if self.pickingEnabledObject != None:
-            if status == 'down':
-                self.pickingEnabledObject.setScale(0.5)
+            if status == 'down' and self.pickingEnabledObject.hasTag('viewport'):
+                self.lookDownPrimarySight(False)
+            else:
+                pass
 
-            if status == 'up':
-                self.pickingEnabledObject.setScale(2)
-
-        elif self.pickingEnabledObject == None:
-            GameFunctionLibrary.displayScreenText(0.8, "hi", 0.1)
+        else:
+            pass
 
     def rayUpdate(self, task):
         if base.mouseWatcherNode.hasMouse():
@@ -346,7 +348,7 @@ class TankGame(ShowBase):
 
             md = self.win.getPointer(0)
             x = md.getX()
-            y = md.getY()
+            y = md.getY()23
             if self.win.movePointer(0, 960, 540):
                 self.heading = self.heading - (x - 960) * 0.2
                 self.pitch = self.pitch - (y - 540) * 0.2
@@ -365,6 +367,16 @@ class TankGame(ShowBase):
             base.win.requestProperties(props)
 
         return task.cont
+
+    def lookDownPrimarySight(self, inSightActivation):
+        if self.inViewport == False and inSightActivation == False:
+            self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
+            self.inViewport = True
+        elif self.inViewport == True and inSightActivation == True:
+            self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
+            self.inViewport = False
+
+
 
 
 
