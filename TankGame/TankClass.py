@@ -10,67 +10,6 @@ from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import WindowProperties
 import GameFunctionLibrary
 
-class Player_Tank_Pat41(object):
-	def __init__(self, scene, posX, posY, posZ):
-		self.scene = scene
-		self.posX = posX
-		self.posY = posY
-		self.posZ = posZ
-
-		self.hullModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/tankhull.egg"
-		self.hullTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/hulluv.png" 
-
-		self.turretModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/tankturret.egg"
-		self.turretTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretuv.png"
-
-		self.gunModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/tankgun.egg"
-		self.gunTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/gunuv.png"
-
-		self.hullInteriorModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/hullinterior.egg"
-		self.hullInteriorTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/hullinteriorcolour.png"
-
-		self.turretInteriorModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretinterior.egg"
-		self.turretInteriorTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretinteriorcolour.png"
-
-		self.breechAssemblyModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechassembly.egg"
-		self.breechAssemblyTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechcolour.png"
-
-		self.breechBar1ModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechshieldbar1.egg"
-		self.breechBar2ModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechshieldbar2.egg"
-		self.breechBarTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechshieldbar2uv.png"
-
-		self.breechMeshModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechshieldmesh.egg"
-		self.breechMeshTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/breechshieldmeshuv.png"
-
-		self.driverSeatModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/driverseat.egg"
-		self.driverSeatTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/driverseatuv.png"
-
-		self.controlBarLeftModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/leftcontrolbar.egg"
-		self.controlBarRightModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/rightcontrolbar.egg"
-		self.controlBarTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/driverstickuv.png"
-
-		self.pedalLeftModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/acceleratorleft.egg"
-		self.pedalRightModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/acceleratorright.egg"
-		self.pedalTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/driverpedaluv.png"
-
-		self.controlPanelModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/driverinfopanel.egg"
-		self.controlPanelTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/driverControlPanelUV.png"
-
-		self.seatsModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretseats.egg"
-		self.seatsTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretseatuv.png"
-
-		self.turretPowerTraverseModelData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretpowertraverse.egg"
-		self.turretPowerTraverseTextureData = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/turretpowertraversecolour.png"
-
-
-
-
-
-
-
-
-
-
 class crewPosition(object):
 	def __init__(self, occupiedPosition, associatedComponent, camPosX, camPosY, camPosZ):
 		self.occupiedPosition = occupiedPosition
