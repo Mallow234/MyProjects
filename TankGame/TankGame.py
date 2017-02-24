@@ -121,6 +121,10 @@ class TankGame(ShowBase):
 
         self.lookingEnabled = True
 
+        self.turretLeft = {"turretLeft": True}
+
+        self.turretRight = {"turretRight": True}
+
 
 
 
@@ -180,8 +184,10 @@ class TankGame(ShowBase):
         auxPowerSwitch = GameFunctionLibrary.loadVehicleComponent(driverAuxPowerSwitchData[0], driverAuxPowerSwitchData[1], driverRightBarLoader, hullInteriorSpace, 0, 0, 0)
 
         self.gunnerPrimarySight = TankClass.visionBlock(self.turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], tankGun, 0.5, 1.6, 2.8, 0, 0, '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/primgunsight.png', 20, 105, self.lens)
-        gunnerPrimarySightModel = self.gunnerPrimarySight.initialiseVisionBlock()
-        gunnerPrimarySightModel.setName('gunnerPrimarySight')
+        self.gunnerPrimarySightModel = self.gunnerPrimarySight.initialiseVisionBlock()
+        self.gunnerPrimarySightModel.setName('gunnerPrimarySight')
+
+        self.turretObjects = [tankTurret, tankGun, self.turretInteriorSpace, breech, breechBar1, breechBar2, breechMesh, gunnerSecondarySight, self.gunnerPrimarySightModel, turretPowerTraverse, turretSeats, commanderVisionBlockFront, commanderVisionBlockLeft, commanderVisionBlockRight, commanderVisionBlockRear]
 
 
 
@@ -218,6 +224,11 @@ class TankGame(ShowBase):
         self.accept("mouse3", self.setKey, ["rotateCamera", True])
         self.accept("mouse3-up", self.setKey, ["rotateCamera", False])
 
+        self.accept("arrow-left", self.setTurretRotationLeft, ["turretLeft", True])
+
+        self.accept("d", self.setTurretRotationRight, ["turretRight", True])
+        self.accept("d-up", self.setTurretRotationRight, ["turretRight", False])
+
         self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, driverPosition.associatedComponent, commanderPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, 2.5, 3.7, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
         self.accept("t-up", self.setTurnedOut, ["isTurnedOut", "occupiedPosition"])
 
@@ -226,6 +237,7 @@ class TankGame(ShowBase):
         self.accept("escape", self.lookDownPrimarySight, [True, "occupiedPosition"])
 
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
+        taskMgr.add(self.turnTurret, "turnTurretTask")
 
         self.heading = 180
         self.pitch = 0
@@ -248,13 +260,13 @@ class TankGame(ShowBase):
         pickerNode.setTag('rays','ray1')
         base.cTrav.addCollider(pickerNP, collisionHandler)
 
-        gunnerPrimarySightCollider = gunnerPrimarySightModel.attachNewNode(CollisionNode('gunnerPrimarySightCNode'))
+        gunnerPrimarySightCollider = self.gunnerPrimarySightModel.attachNewNode(CollisionNode('gunnerPrimarySightCNode'))
         gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.575, 0.64, 2.64, 0.08))
 
         #gunnerPrimarySightCollider.show()
 
         gunnerPrimarySightCollider.setTag('viewport', 'gunnerPrimarySight')
-        gunnerPrimarySightModel.setTag('viewport', 'gunnerPrimarySight')
+        self.gunnerPrimarySightModel.setTag('viewport', 'gunnerPrimarySight')
 
         collisionHandler.addInPattern("%(rays)ft-into-%(viewport)it")
         collisionHandler.addOutPattern("%(rays)ft-out-%(viewport)it")
@@ -270,8 +282,6 @@ class TankGame(ShowBase):
         DO.accept('mouse1', self.mouseClick, ['down'])
 
         taskMgr.add(self.rayUpdate, "updatePicker")
-
-
 
 
         AI_Tank_1 = TankClass.AI_Tank_Type37(self.scene, 40, -40, 0, 30, 1)
@@ -317,6 +327,12 @@ class TankGame(ShowBase):
 
     def setKey(self, key, value):
         self.keyMap[key] = value
+
+    def setTurretRotationLeft(self, key, value):
+        self.turretLeft[key] = value
+
+    def setTurretRotationRight(self, key, value):
+        self.turretRight[key] = value
 
     def changeOccupiedPosition(self, key, value, isTurnedOut, keyIsTurnedOut):
         if isTurnedOut[keyIsTurnedOut] == False:
@@ -381,6 +397,28 @@ class TankGame(ShowBase):
             self.inViewport = False
             self.lookingEnabled = True
             GameFunctionLibrary.changePosition(self.occupiedPosition, 5, self.turretInteriorSpace, 0.8, 0.4, 2.9, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
+
+    def turnTurret(self, task):
+        if self.turretLeft["turretLeft"] == True:
+            for x in self.turretObjects:
+                objectHeading = x.getH()
+                newHeading = x.setHpr(objectHeading - 0.5, 0, 0)
+
+                elapsed = task.time - self.last
+                if self.last == 0:
+                    elapsed = 0
+                self.last = task.time
+
+        elif self.turretRight["turretRight"] == True:
+            for x in self.turretObjects:
+                objectHeading = x.getH()
+                newHeading = x.setHpr(objectHeading + 0.5, 0, 0)
+
+                elapsed = task.time - self.last
+                if self.last == 0:
+                    elapsed = 0
+                self.last = task.time
+
     
 
 
