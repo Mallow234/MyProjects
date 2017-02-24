@@ -121,9 +121,13 @@ class TankGame(ShowBase):
 
         self.lookingEnabled = True
 
-        self.turretLeft = {"turretLeft": True}
+        self.turretLeft = {"turretLeft": False}
 
-        self.turretRight = {"turretRight": True}
+        self.turretRight = {"turretRight": False}
+
+        self.gunElevate = {"gunUp": False}
+
+        self.gunDepress = {"gunDown": False}
 
 
 
@@ -189,6 +193,8 @@ class TankGame(ShowBase):
 
         self.turretObjects = [tankTurret, tankGun, self.turretInteriorSpace, breech, breechBar1, breechBar2, breechMesh, gunnerSecondarySight, self.gunnerPrimarySightModel, turretPowerTraverse, turretSeats, commanderVisionBlockFront, commanderVisionBlockLeft, commanderVisionBlockRight, commanderVisionBlockRear]
 
+        self.gunObjects = [tankGun, breech, breechBar1, breechBar2, breechMesh, gunnerSecondarySight, self.gunnerPrimarySightModel]
+
 
 
 
@@ -201,35 +207,42 @@ class TankGame(ShowBase):
         camera.setPos(self.turretInteriorSpace, 0, 0, 3)
         camera.setHpr(self.turretInteriorSpace, 0, 0, 0)
 
-        commanderPosition = TankClass.crewPosition(0, self.turretInteriorSpace, 0.6, -0.5, 3.16)
-        gunnerPosition = TankClass.crewPosition(1, self.turretInteriorSpace, 0.8, 0.4, 2.9)
-        loaderPosition = TankClass.crewPosition(2, self.turretInteriorSpace, -0.45, -0.3, 2.9)
-        driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.86)
+        self.commanderPosition = TankClass.crewPosition(0, self.turretInteriorSpace, 0.6, -0.5, 3.16)
+        self.gunnerPosition = TankClass.crewPosition(1, self.turretInteriorSpace, 0.8, 0.4, 2.9)
+        self.loaderPosition = TankClass.crewPosition(2, self.turretInteriorSpace, -0.45, -0.3, 2.9)
+        self.driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.86)
 
-        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
+        GameFunctionLibrary.changePosition(self.occupiedPosition, 0, self.commanderPosition.associatedComponent, self.commanderPosition.camPosX, self.commanderPosition.camPosY, self.commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
 
-        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, commanderPosition.associatedComponent, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("1",GameFunctionLibrary.changePosition, [self.occupiedPosition, 0, self.commanderPosition.associatedComponent, self.commanderPosition.camPosX, self.commanderPosition.camPosY, self.commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("1-up", self.changeOccupiedPosition, ["occupiedPosition", 0, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, gunnerPosition.associatedComponent, gunnerPosition.camPosX, gunnerPosition.camPosY, gunnerPosition.camPosZ, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("2",GameFunctionLibrary.changePosition, [self.occupiedPosition, 1, self.gunnerPosition.associatedComponent, self.gunnerPosition.camPosX, self.gunnerPosition.camPosY, self.gunnerPosition.camPosZ, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("2-up", self.changeOccupiedPosition, ["occupiedPosition", 1, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, loaderPosition.associatedComponent, loaderPosition.camPosX, loaderPosition.camPosY, loaderPosition.camPosZ, self.positionUIElements, loaderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("3",GameFunctionLibrary.changePosition, [self.occupiedPosition, 2, self.loaderPosition.associatedComponent, self.loaderPosition.camPosX, self.loaderPosition.camPosY, self.loaderPosition.camPosZ, self.positionUIElements, loaderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("3-up", self.changeOccupiedPosition, ["occupiedPosition", 2, self.turnedOut, 'isTurnedOut'])
 
-        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, driverPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, self.positionUIElements, driverText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
+        self.accept("4",GameFunctionLibrary.changePosition, [self.occupiedPosition, 3, self.driverPosition.associatedComponent, self.driverPosition.camPosX, self.driverPosition.camPosY, self.driverPosition.camPosZ, self.positionUIElements, driverText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut'])
         self.accept("4-up", self.changeOccupiedPosition, ["occupiedPosition", 3, self.turnedOut, 'isTurnedOut'])
 
 
         self.accept("mouse3", self.setKey, ["rotateCamera", True])
         self.accept("mouse3-up", self.setKey, ["rotateCamera", False])
 
-        self.accept("arrow-left", self.setTurretRotationLeft, ["turretLeft", True])
+        self.accept("a", self.setTurretRotationLeft, ["turretLeft", True])
+        self.accept("a-up", self.setTurretRotationLeft, ["turretLeft", False])
 
         self.accept("d", self.setTurretRotationRight, ["turretRight", True])
         self.accept("d-up", self.setTurretRotationRight, ["turretRight", False])
 
-        self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, driverPosition.associatedComponent, commanderPosition.associatedComponent, driverPosition.camPosX, driverPosition.camPosY, driverPosition.camPosZ, commanderPosition.camPosX, commanderPosition.camPosY, commanderPosition.camPosZ, 2.5, 3.7, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
+        self.accept("w", self.setGunUp, ["gunUp", True])
+        self.accept("w-up", self.setGunUp, ["gunUp", False])
+
+        self.accept("s", self.setGunUp, ["gunDown", True])
+        self.accept("s-up", self.setGunUp, ["gunDown", False])
+
+        self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, self.driverPosition.associatedComponent, self.commanderPosition.associatedComponent, self.driverPosition.camPosX, self.driverPosition.camPosY, self.driverPosition.camPosZ, self.commanderPosition.camPosX, self.commanderPosition.camPosY, self.commanderPosition.camPosZ, 2.5, 3.7, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
         self.accept("t-up", self.setTurnedOut, ["isTurnedOut", "occupiedPosition"])
 
         self.accept("b", self.binoculars, ["isTurnedOut", "occupiedPosition"])
@@ -238,6 +251,7 @@ class TankGame(ShowBase):
 
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
         taskMgr.add(self.turnTurret, "turnTurretTask")
+        taskMgr.add(self.slewGun, "slewGunTask")
 
         self.heading = 180
         self.pitch = 0
@@ -334,6 +348,12 @@ class TankGame(ShowBase):
     def setTurretRotationRight(self, key, value):
         self.turretRight[key] = value
 
+    def setGunUp(self, key, value):
+        self.gunElevate[key] = value
+
+    def setGunDown(self, key, value):
+        self.gunDepress[key] = value
+
     def changeOccupiedPosition(self, key, value, isTurnedOut, keyIsTurnedOut):
         if isTurnedOut[keyIsTurnedOut] == False:
             self.occupiedPosition[key] = value
@@ -399,25 +419,59 @@ class TankGame(ShowBase):
             GameFunctionLibrary.changePosition(self.occupiedPosition, 5, self.turretInteriorSpace, 0.8, 0.4, 2.9, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
 
     def turnTurret(self, task):
-        if self.turretLeft["turretLeft"] == True:
+        if self.turretLeft["turretLeft"] == True and self.occupiedPosition["occupiedPosition"] == 1 and self.inViewport == True:
             for x in self.turretObjects:
                 objectHeading = x.getH()
-                newHeading = x.setHpr(objectHeading - 0.5, 0, 0)
+                newHeading = objectHeading + 0.3
+                x.setHpr(newHeading, 0, 0)
+                GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, newHeading, x.getP())
+            elapsed = task.time - self.last
+            if self.last == 0:
+                elapsed = 0
+            self.last = task.time
 
-                elapsed = task.time - self.last
-                if self.last == 0:
-                    elapsed = 0
-                self.last = task.time
-
-        elif self.turretRight["turretRight"] == True:
+        elif self.turretRight["turretRight"] == True and self.occupiedPosition["occupiedPosition"] == 1 and self.inViewport == True:
             for x in self.turretObjects:
                 objectHeading = x.getH()
-                newHeading = x.setHpr(objectHeading + 0.5, 0, 0)
+                newHeading = objectHeading - 0.3
+                x.setHpr(newHeading, 0, 0)
+                GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedCamComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, newHeading, x.getP())
+            elapsed = task.time - self.last
+            if self.last == 0:
+                elapsed = 0
+            self.last = task.time
 
-                elapsed = task.time - self.last
-                if self.last == 0:
-                    elapsed = 0
-                self.last = task.time
+        return task.cont
+
+    def slewGun(self, task):
+        if self.gunElevate["gunUp"] == True and self.occupiedPosition["occupiedPosition"] == 1 and self.inViewport == True:
+            for x in self.gunObjects:
+                elevation = x.getP()
+                newElevation = elevation + 0.05
+                if newElevation > 16:
+                    newElevation = 16
+                x.setP(newElevation)
+                GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, x.getH(), newElevation)
+            elapsed = task.time - self.last
+            if self.last == 0:
+                elapsed = 0
+            self.last = task.time
+
+        if self.gunDepress["gunDown"] == True and self.occupiedPosition["occupiedPosition"] == 1 and self.inViewport == True:
+            for x in self.gunObjects:
+                depression = x.getP()
+                newDepression = depression - 0.05
+                if newDepression > 8:
+                    newDepression = 8
+                x.setP(newDepression)
+                GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, x.getH(), newDepression)
+            elapsed = task.time - self.last
+            if self.last == 0:
+                elapsed = 0
+            self.last = task.time
+
+        return task.cont
+
 
     
 

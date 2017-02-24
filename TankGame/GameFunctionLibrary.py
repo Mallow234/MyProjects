@@ -52,6 +52,11 @@ def changePosition(occupiedPosition, positionToMove, associatedSpace, cameraPosX
 	else:
 		pass
 
+def updateCameraPosition(associatedSpace, cameraPosX, cameraPosY, cameraPosZ, cameraHeading, cameraPitch):
+	camera.setPos(associatedSpace, cameraPosX, cameraPosY, cameraPosZ)
+	camera.setH(cameraHeading)
+	camera.setP(cameraPitch)
+
 def lookThroughSight(sightObject, screenElement, associatedSpace, cameraPosX, cameraPosY, cameraPosZ, lens, fieldOfView):
 	if base.mouseWatcherNode.hasMouse():
 		mpos = base.mouseWatcherNode.getMouse()
