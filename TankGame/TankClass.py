@@ -9,6 +9,7 @@ from direct.interval.IntervalGlobal import *
 from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import WindowProperties
 import GameFunctionLibrary
+import math
 
 class crewPosition(object):
 	def __init__(self, occupiedPosition, associatedComponent, camPosX, camPosY, camPosZ):
@@ -57,7 +58,7 @@ class visionBlock(object):
 	def lookInVisionBlock(self, inViewport, visionBlockOverlay):
 		if inViewport == False:
 			camera.setPos(self.associatedCamComponent, self.camPosX, self.camPosY, self.camPosZ)
-			camera.setHpr(0, 0, 0)
+			camera.setHpr(self.associatedCamComponent.getH(), self.associatedCamComponent.getP(), 0)
 			visionBlockOverlay = OnscreenImage(self.visionBlockTexture, pos = (0, 0, 0))
 			visionBlockOverlay.setTransparency(1)
 			visionBlockOverlay.reparentTo(render2d)
@@ -117,6 +118,46 @@ class AI_Tank_Type37(object):
 			x.setH(self.spawnDir)
 
 		return tankComponentArray
+
+class Shell_AP_75_Pat40(object):
+	def __init__(self):
+		self.shellModel = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/shell_effect.egg"
+		self.shellTexture = "/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/shellUV.png"
+
+		self.initialVelocity = 40
+		self.airResistance = 1
+		self.armourPenetration = 90
+
+	def spawnShell(self, gunX, gunY, gunZ, gunH, gunP):
+		muzzleXZ = 4 * math.sin(gunH)
+		muzzleX = gunX + muzzleXZ
+
+		muzzleYY = 4 * math.cos(gunH)
+		muzzleY = gunY + muzzleYY
+
+		muzzleZZ = 4 * math.sin(gunP)
+		muzzleZ = gunZ + muzzleZZ
+
+		shell = loader.loadModel(self.shellModel)
+		shell.reparentTo(render)
+
+		shellTexture = loader.loadTexture(self.shellTexture)
+		shell.setTexture(shellTexture)
+		shell.set_two_sided(True)
+
+		shell.setPos(muzzleX, muzzleY, muzzleZ)
+		shell.setH(gunH)
+		shell.setP(gunP)
+
+		return shell
+
+
+
+
+		
+
+
+
 
 
 

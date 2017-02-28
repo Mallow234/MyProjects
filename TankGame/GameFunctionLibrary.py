@@ -7,6 +7,7 @@ from panda3d.core import PandaNode, NodePath, Camera, TextNode
 from direct.interval.IntervalGlobal import *
 from direct.gui.OnscreenImage import OnscreenImage
 import TankClass
+import math
 
 def configureCamera(lens, fieldOfView, nearDistance, farDistance):
 	lens.setFov(fieldOfView)

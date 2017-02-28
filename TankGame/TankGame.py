@@ -13,6 +13,7 @@ from panda3d.core import WindowProperties
 from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
 from direct.gui.OnscreenImage import OnscreenImage
+import math
 import TankClass
 import GameFunctionLibrary
 
@@ -135,24 +136,24 @@ class TankGame(ShowBase):
         #load models and texture (FOR EXTERIOR)
         tankHull = GameFunctionLibrary.loadVehicleComponent(hullData[0] , hullData[1], tankHullLoader, None, 0, 0, 0)
 
-        tankHull.setPos(0,0,1)
+        tankHull.setPos(0,0,0)
 
-        tankTurret = GameFunctionLibrary.loadVehicleComponent(turretData[0], turretData[1], tankTurretLoader, tankHull, 0, 0, 0)
+        self.tankTurret = GameFunctionLibrary.loadVehicleComponent(turretData[0], turretData[1], tankTurretLoader, tankHull, 0, 0.15, 2.64)
 
-        tankGun = GameFunctionLibrary.loadVehicleComponent(gunData[0], gunData[1], tankGunLoader, tankTurret, 0, 0, 0)
+        self.tankGun = GameFunctionLibrary.loadVehicleComponent(gunData[0], gunData[1], tankGunLoader, self.tankTurret, 0, 1.3, 0)
 
         #load models and texture (FOR INTERIOR)
-        self.turretInteriorSpace = GameFunctionLibrary.loadVehicleComponent(turretInteriorData[0], turretInteriorData[1], interiorTurretLoader, tankTurret, 0, 0, 0)
+        self.turretInteriorSpace = GameFunctionLibrary.loadVehicleComponent(turretInteriorData[0], turretInteriorData[1], interiorTurretLoader, self.tankTurret, 0, 0, 0)
 
         hullInteriorSpace = GameFunctionLibrary.loadVehicleComponent(hullInteriorData[0], hullInteriorData[1], interiorHullLoader, tankHull, 0, 0, 0)
 
-        breech = GameFunctionLibrary.loadVehicleComponent(breechAssemblyData[0], breechAssemblyData[1], breechAssemblyLoader, self.turretInteriorSpace, 0, 0, 0)
+        breech = GameFunctionLibrary.loadVehicleComponent(breechAssemblyData[0], breechAssemblyData[1], breechAssemblyLoader, self.tankGun, 0, 0, 0)
 
-        breechBar1 = GameFunctionLibrary.loadVehicleComponent(breechBar1Data[0], breechBar1Data[1], breechBar1Loader, self.turretInteriorSpace, 0, 0, 0)
+        breechBar1 = GameFunctionLibrary.loadVehicleComponent(breechBar1Data[0], breechBar1Data[1], breechBar1Loader, self.tankGun, 0, 0, 0)
 
-        breechBar2 = GameFunctionLibrary.loadVehicleComponent(breechBar2Data[0], breechBar2Data[1], breechBar2Loader, self.turretInteriorSpace, 0, 0, 0)
+        breechBar2 = GameFunctionLibrary.loadVehicleComponent(breechBar2Data[0], breechBar2Data[1], breechBar2Loader, self.tankGun, 0, 0, 0)
 
-        breechMesh = GameFunctionLibrary.loadVehicleComponent(breechMeshData[0], breechMeshData[1], breechMeshLoader, self.turretInteriorSpace, 0, 0, 0)
+        breechMesh = GameFunctionLibrary.loadVehicleComponent(breechMeshData[0], breechMeshData[1], breechMeshLoader, self.tankGun, 0, 0, 0)
 
         gunnerSecondarySight = GameFunctionLibrary.loadVehicleComponent(gunnerSecondarySightData[0], gunnerSecondarySightData[1], gunnerSecondarySightLoader, self.turretInteriorSpace, 0, 0, 0)
 
@@ -187,13 +188,13 @@ class TankGame(ShowBase):
 
         auxPowerSwitch = GameFunctionLibrary.loadVehicleComponent(driverAuxPowerSwitchData[0], driverAuxPowerSwitchData[1], driverRightBarLoader, hullInteriorSpace, 0, 0, 0)
 
-        self.gunnerPrimarySight = TankClass.visionBlock(self.turretInteriorSpace, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], tankGun, 0.5, 1.6, 2.8, 0, 0, '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/primgunsight.png', 20, 105, self.lens)
+        self.gunnerPrimarySight = TankClass.visionBlock(self.tankGun, 0, 0, 0, gunnerPrimarySightData[0], gunnerPrimarySightData[1], self.tankGun, 0.4, 0.2, 0.5, 0, 0, '/c/Panda3D-1.9.2/MyProjects/TankGame/Assets/misc/primgunsight.png', 10, 105, self.lens)
         self.gunnerPrimarySightModel = self.gunnerPrimarySight.initialiseVisionBlock()
         self.gunnerPrimarySightModel.setName('gunnerPrimarySight')
 
-        self.turretObjects = [tankTurret, tankGun, self.turretInteriorSpace, breech, breechBar1, breechBar2, breechMesh, gunnerSecondarySight, self.gunnerPrimarySightModel, turretPowerTraverse, turretSeats, commanderVisionBlockFront, commanderVisionBlockLeft, commanderVisionBlockRight, commanderVisionBlockRear]
+        self.turretObjects = [self.tankTurret, self.tankGun, self.turretInteriorSpace, breech, breechBar1, breechBar2, breechMesh, gunnerSecondarySight, self.gunnerPrimarySightModel, turretPowerTraverse, turretSeats, commanderVisionBlockFront, commanderVisionBlockLeft, commanderVisionBlockRight, commanderVisionBlockRear]
 
-        self.gunObjects = [tankGun, breech, breechBar1, breechBar2, breechMesh, gunnerSecondarySight, self.gunnerPrimarySightModel]
+        self.gunObjects = [self.tankGun, breech, breechBar1, breechBar2, breechMesh, self.gunnerPrimarySightModel]
 
 
 
@@ -207,10 +208,10 @@ class TankGame(ShowBase):
         camera.setPos(self.turretInteriorSpace, 0, 0, 3)
         camera.setHpr(self.turretInteriorSpace, 0, 0, 0)
 
-        self.commanderPosition = TankClass.crewPosition(0, self.turretInteriorSpace, 0.6, -0.5, 3.16)
-        self.gunnerPosition = TankClass.crewPosition(1, self.turretInteriorSpace, 0.8, 0.4, 2.9)
-        self.loaderPosition = TankClass.crewPosition(2, self.turretInteriorSpace, -0.45, -0.3, 2.9)
-        self.driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.85, 1.94, 1.86)
+        self.commanderPosition = TankClass.crewPosition(0, self.turretInteriorSpace, 0.6, -0.6, 0.63)
+        self.gunnerPosition = TankClass.crewPosition(1, self.turretInteriorSpace, 0.8, 0.2, 0.3)
+        self.loaderPosition = TankClass.crewPosition(2, self.turretInteriorSpace, -0.45, -0.3, 0.3)
+        self.driverPosition = TankClass.crewPosition(3, hullInteriorSpace, -0.81, 1.94, 1.86)
 
         GameFunctionLibrary.changePosition(self.occupiedPosition, 0, self.commanderPosition.associatedComponent, self.commanderPosition.camPosX, self.commanderPosition.camPosY, self.commanderPosition.camPosZ, self.positionUIElements, commanderText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
 
@@ -239,10 +240,10 @@ class TankGame(ShowBase):
         self.accept("w", self.setGunUp, ["gunUp", True])
         self.accept("w-up", self.setGunUp, ["gunUp", False])
 
-        self.accept("s", self.setGunUp, ["gunDown", True])
-        self.accept("s-up", self.setGunUp, ["gunDown", False])
+        self.accept("s", self.setGunDown, ["gunDown", True])
+        self.accept("s-up", self.setGunDown, ["gunDown", False])
 
-        self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, self.driverPosition.associatedComponent, self.commanderPosition.associatedComponent, self.driverPosition.camPosX, self.driverPosition.camPosY, self.driverPosition.camPosZ, self.commanderPosition.camPosX, self.commanderPosition.camPosY, self.commanderPosition.camPosZ, 2.5, 3.7, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
+        self.accept("t", GameFunctionLibrary.turnOut, [self.occupiedPosition, self.driverPosition.associatedComponent, self.commanderPosition.associatedComponent, self.driverPosition.camPosX, self.driverPosition.camPosY, self.driverPosition.camPosZ, self.commanderPosition.camPosX, self.commanderPosition.camPosY, self.commanderPosition.camPosZ, 2.5, 1.3, self.turnedOut, 'isTurnedOut', 'occupiedPosition'])
         self.accept("t-up", self.setTurnedOut, ["isTurnedOut", "occupiedPosition"])
 
         self.accept("b", self.binoculars, ["isTurnedOut", "occupiedPosition"])
@@ -252,6 +253,8 @@ class TankGame(ShowBase):
         taskMgr.add(self.rotateCamera, "rotateCameraTask")
         taskMgr.add(self.turnTurret, "turnTurretTask")
         taskMgr.add(self.slewGun, "slewGunTask")
+
+        self.accept("space", self.fireGun)
 
         self.heading = 180
         self.pitch = 0
@@ -275,7 +278,7 @@ class TankGame(ShowBase):
         base.cTrav.addCollider(pickerNP, collisionHandler)
 
         gunnerPrimarySightCollider = self.gunnerPrimarySightModel.attachNewNode(CollisionNode('gunnerPrimarySightCNode'))
-        gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.575, 0.64, 2.64, 0.08))
+        gunnerPrimarySightCollider.node().addSolid(CollisionSphere(0.65, -0.88, 0.03, 0.08))
 
         #gunnerPrimarySightCollider.show()
 
@@ -416,15 +419,18 @@ class TankGame(ShowBase):
             self.viewportOverlay = self.gunnerPrimarySight.lookInVisionBlock(self.inViewport, self.viewportOverlay)
             self.inViewport = False
             self.lookingEnabled = True
-            GameFunctionLibrary.changePosition(self.occupiedPosition, 5, self.turretInteriorSpace, 0.8, 0.4, 2.9, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
+            GameFunctionLibrary.changePosition(self.occupiedPosition, 5, self.turretInteriorSpace, 0.8, 0.2, 0.3, self.positionUIElements, self.gunnerText, self.positionUIElementsActive, self.turnedOut, 'isTurnedOut')
 
     def turnTurret(self, task):
         if self.turretLeft["turretLeft"] == True and self.occupiedPosition["occupiedPosition"] == 1 and self.inViewport == True:
             for x in self.turretObjects:
                 objectHeading = x.getH()
-                newHeading = objectHeading + 0.3
-                x.setHpr(newHeading, 0, 0)
-                GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, newHeading, x.getP())
+                newHeading = objectHeading + 0.1
+                x.setH(newHeading)
+            self.tankGun.setPos(self.tankTurret, 0, 1.3, 0)
+            for x in self.gunObjects:
+                x.setPos(self.tankGun, 0, 0, 0)
+            GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, newHeading, camera.getP())
             elapsed = task.time - self.last
             if self.last == 0:
                 elapsed = 0
@@ -433,9 +439,12 @@ class TankGame(ShowBase):
         elif self.turretRight["turretRight"] == True and self.occupiedPosition["occupiedPosition"] == 1 and self.inViewport == True:
             for x in self.turretObjects:
                 objectHeading = x.getH()
-                newHeading = objectHeading - 0.3
-                x.setHpr(newHeading, 0, 0)
-                GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedCamComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, newHeading, x.getP())
+                newHeading = objectHeading - 0.1
+                x.setH(newHeading)
+            self.tankGun.setPos(self.tankTurret, 0, 1.3, 0)
+            for x in self.gunObjects:
+                x.setPos(self.tankGun, 0, 0, 0)
+            GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedCamComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, newHeading, camera.getP())
             elapsed = task.time - self.last
             if self.last == 0:
                 elapsed = 0
@@ -461,8 +470,8 @@ class TankGame(ShowBase):
             for x in self.gunObjects:
                 depression = x.getP()
                 newDepression = depression - 0.05
-                if newDepression > 8:
-                    newDepression = 8
+                if newDepression < -8:
+                    newDepression = -8
                 x.setP(newDepression)
                 GameFunctionLibrary.updateCameraPosition(self.gunnerPrimarySight.associatedComponent, self.gunnerPrimarySight.camPosX, self.gunnerPrimarySight.camPosY, self.gunnerPrimarySight.camPosZ, x.getH(), newDepression)
             elapsed = task.time - self.last
@@ -471,6 +480,10 @@ class TankGame(ShowBase):
             self.last = task.time
 
         return task.cont
+
+    def fireGun(self):
+        shell1 = TankClass.Shell_AP_75_Pat40()
+        shell1.spawnShell(self.tankGun.getX(), self.tankGun.getY(), self.tankGun.getZ(), self.tankGun.getH(), self.tankGun.getP())
 
 
     
